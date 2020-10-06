@@ -1,0 +1,22 @@
+serverPrefix: '&7[&3&lAwesomeLevels&7]&r'
+
+#Title for menu that opens when you type /level
+levelMenuTitle: '&3&lAwesomeLevels'
+
+#Change chat message format
+chatFormat: '<levelPrefix><playerPrefix>&e<playerName>&8: &7<chat>'
+
+#Max Level
+numberOfLevels: 100
+
+#Other prices change according to the first price
+firstLevelPrice: 1000.0
+
+#Effects when leveling up!
+levelUpSound: true
+levelUpFirework: true
+
+#Prefix for Levels in the chat
+levelPrefix: '&7[&9&l%level%&7] &r' #This one is for all levels
+level10Prefix: '&7[&d&l%level%&7] &r' #This one is for certain levels
+level100Prefix: '&7[&c&l%level%&7] &r' 

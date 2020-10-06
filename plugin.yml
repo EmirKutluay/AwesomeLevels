@@ -1,0 +1,12 @@
+name: AwesomeLevels
+main: com.emiv.awesomelevels.Main
+version: 1.3
+api-version: 1.16
+softdepend: [Vault]
+commands:
+  level:
+    aliases: [levels, levelup, rank, rankup]
+    description: Main level command
+  alreload:
+    aliases:
+    description: Reload the configs

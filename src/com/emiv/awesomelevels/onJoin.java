@@ -17,6 +17,7 @@ public class onJoin implements Listener {
 	public void Save() {
 		try {
 			plugin.getLYaml().save(plugin.getLFile());
+			plugin.getPYaml().save(plugin.getPFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -27,6 +28,12 @@ public class onJoin implements Listener {
 		Player p = e.getPlayer();
 		if (!plugin.getLYaml().contains(p.getName())) {
 			plugin.getLYaml().set(p.getName(), String.valueOf(0));
+		}
+		String[] effects = {"FAST_DIGGING", "FIRE_RESISTANCE", "INCREASE_DAMAGE", "JUMP", "NIGHT_VISION", "REGENERATION", "SPEED", "WATER_BREATHING"};
+		for (String s : effects) {
+			if (!plugin.getPYaml().contains(p.getName() + "." + s)) {
+				plugin.getPYaml().set(p.getName() + "." + s, 0);
+			}
 		}
 		Save();
 	}

@@ -53,6 +53,7 @@ public class LevelListener implements Listener {
 	public void Save() {
 		try {
 			plugin.getLYaml().save(plugin.getLFile());
+			plugin.getPYaml().save(plugin.getPFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -79,11 +80,14 @@ public class LevelListener implements Listener {
 		if (plugin.getRYaml().contains("Level" + String.valueOf(playerLevel + 1) + ".Commands.Player")) {
 			p.performCommand(plugin.getRYaml().getString("Level" + String.valueOf(playerLevel + 1) + ".Commands.Player"));
 		}
+		if (plugin.getRYaml().contains("Level" + String.valueOf(playerLevel + 1) + ".Effect.Type") && plugin.getRYaml().contains("Level" + String.valueOf(playerLevel + 1) + ".Effect.Tier")) {
+			plugin.getPYaml().set(p.getName() + "." + plugin.getRYaml().getString("Level" + String.valueOf(playerLevel + 1) + ".Effect.Type"), plugin.getRYaml().getInt("Level" + String.valueOf(playerLevel + 1) + ".Effect.Tier"));
+		}
 		Save();
 	}
 	
     public static void spawnFireworks(Location location, int amount){
-        Location loc = location;
+        Location loc = location.add(0.0, 8.0, 0.0);
         Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
         FireworkMeta fwm = fw.getFireworkMeta();
        

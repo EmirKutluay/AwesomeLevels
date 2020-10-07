@@ -5,8 +5,11 @@ import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -30,9 +33,14 @@ public class Main extends JavaPlugin{
 	private File mFile;
 	private YamlConfiguration mYaml;
 	
+	//Rewards
 	private File rFile;
 	private YamlConfiguration rYaml;
 
+	//Potion Effects
+	private File pFile;
+	private YamlConfiguration pYaml;
+	
 	@Override
 	public void onEnable() {
 		setupEconomy();
@@ -58,8 +66,26 @@ public class Main extends JavaPlugin{
 		rankupPriceClass.SetupPrices();
 		setRewards();
 		Save();
+		
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(Bukkit.getPluginManager().getPlugin("AwesomeLevels"), new Runnable() {
+		    @Override
+		    public void run() {
+		        SetPotionEffects();
+		    }
+		}, 0L, 200L);
 	}
 	
+	void SetPotionEffects() {
+		String[] effects = {"FAST_DIGGING", "FIRE_RESISTANCE", "INCREASE_DAMAGE", "JUMP", "NIGHT_VISION", "REGENERATION", "SPEED", "WATER_BREATHING"};
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			for (String s : effects) {
+				if (pYaml.getInt(p.getName() + "." + s) != 0) {
+					p.addPotionEffect(new PotionEffect(PotionEffectType.getByName(s), 200, pYaml.getInt(p.getName() + "." + s)));
+				}
+			}
+		}
+	}
+
 	public void setMsg() {
 		if (!mYaml.contains("NoPermission")) {
 			mYaml.set("NoPermission", "&cYou don't have permission.");
@@ -78,13 +104,16 @@ public class Main extends JavaPlugin{
 		rYaml.set("Level1.Reward.Message", "&eYou recieved 5 diamonds for leveling up!");
 		rYaml.set("Level1.Reward.Text", "5 Diamonds");
 		rYaml.set("Level1.Commands.Console", "give %player% diamond 5");
-		rYaml.set("Level10.Reward.Message", "&eYou unlocked kit king for leveling up!");
-		rYaml.set("Level10.Reward.Text", "King Kit");
-		rYaml.set("Level10.Commands.Console", "lp user %player% permission set kit.king true");
-		rYaml.set("Level100.Reward.Message", "&eYou recieved god rank for being max level!");
-		rYaml.set("Level100.Reward.Text", "God Rank");
-		rYaml.set("Level100.Commands.Console", "lp user %player% parent set God");
+		rYaml.set("Level10.Reward.Message", "&eYou unlocked kit king and permanent Haste I for leveling up!");
+		rYaml.set("Level10.Reward.Text", "King Kit\nHaste I");
+		rYaml.set("Level10.Effect.Type", "FAST_DIGGING");
+		rYaml.set("Level10.Effect.Tier", 1);
+		rYaml.set("Level100.Reward.Message", "&eYou recieved VIP Rank and permanent Strength II for being max level!");
+		rYaml.set("Level100.Reward.Text", "VIP Rank\nStrength II");
+		rYaml.set("Level100.Commands.Console", "lp user %player% parent set vip");
 		rYaml.set("Level100.Commands.Player", "say I am now max level!");
+		rYaml.set("Level100.Effect.Type", "INCREASE_DAMAGE");
+		rYaml.set("Level100.Effect.Tier", 2);
 	}
 	
 	
@@ -119,6 +148,8 @@ public class Main extends JavaPlugin{
 	public File getMFile() { return mFile; }
 	public YamlConfiguration getRYaml() { return rYaml; }
 	public File getRFile() { return rFile; }
+	public YamlConfiguration getPYaml() { return pYaml; }
+	public File getPFile() { return pFile; }
 	
 	public void initiateFiles() throws IOException {
 		lFile = new File(Bukkit.getServer().getPluginManager().getPlugin("AwesomeLevels").getDataFolder(), "levels.yml");
@@ -141,6 +172,13 @@ public class Main extends JavaPlugin{
 		}
 		
 		rYaml = YamlConfiguration.loadConfiguration(rFile);
+		
+		pFile = new File(Bukkit.getServer().getPluginManager().getPlugin("AwesomeLevels").getDataFolder(), "potioneffects.yml");
+		if (!pFile.exists()) {
+			pFile.createNewFile();
+		}
+		
+		pYaml = YamlConfiguration.loadConfiguration(pFile);
 	}
 
 }

@@ -19,17 +19,13 @@ public class onChat implements Listener {
 		
 		Player p = e.getPlayer();
 		p.setDisplayName(p.getName());
-		String chatFormat = plugin.getConfig().getString("chatFormat");
+		String format = e.getFormat();
 		if (plugin.getConfig().contains("level" + plugin.getLYaml().getString(p.getName()) + "Prefix")) {
-			chatFormat = chatFormat.replace("<levelPrefix>", plugin.getConfig().getString("level" + plugin.getLYaml().getString(p.getName()) + "Prefix").replace("%level%", plugin.getLYaml().getString(p.getName())));
+			format = format.replace("awesomeLevel", ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("level" + plugin.getLYaml().getString(p.getName()) + "Prefix").replace("%level%", plugin.getLYaml().getString(p.getName()))));
 		} else {
-			chatFormat = chatFormat.replace("<levelPrefix>", plugin.getConfig().getString("levelPrefix").replace("%level%", plugin.getLYaml().getString(p.getName())));
-		}
-		chatFormat = chatFormat.replace("<playerPrefix>", Main.chat.getPlayerPrefix(p));
-		chatFormat = chatFormat.replace("<playerName>", "%s");
-		chatFormat = chatFormat.replace("<chat>", "%s");
-		e.setFormat(ChatColor.translateAlternateColorCodes('&', chatFormat));
-		
+			format = format.replace("awesomeLevel", ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("levelPrefix").replace("%level%", plugin.getLYaml().getString(p.getName()))));
+		}		
+		e.setFormat(format);
 	}
 	
 }

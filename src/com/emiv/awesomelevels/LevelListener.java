@@ -37,7 +37,7 @@ public class LevelListener implements Listener {
 					break;
 				case RED_STAINED_GLASS_PANE:
 					p.closeInventory();
-					p.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("serverPrefix") + " " + plugin.getMYaml().getString("LevelUpNoMoney")));
+					p.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("serverPrefix") + " " + plugin.getMYaml().getString("LevelUpNotMet")));
 					break;
 				case BLUE_STAINED_GLASS_PANE:
 					p.closeInventory();
@@ -61,7 +61,8 @@ public class LevelListener implements Listener {
 	
 	public void rankupCmd(Player p) {
 		int playerLevel = Integer.valueOf(plugin.getLYaml().getString(p.getName()));
-		Double price = SetupRankupPrices.rankupPrices.get(playerLevel + 1);
+		int nextLevel = playerLevel + 1;
+		Double price = (double) plugin.getReqYaml().getInt("Level" + nextLevel + ".Coin");
 		p.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("serverPrefix") + " " + plugin.getMYaml().getString("LevelUpSuccess").replace("%level%", String.valueOf(playerLevel + 1))));
 		Main.econ.withdrawPlayer(p, price);
 		plugin.getLYaml().set(p.getName(), String.valueOf(playerLevel + 1));

@@ -4,10 +4,7 @@ serverPrefix: '&7[&3&lAwesomeLevels&7]&r'
 levelMenuTitle: '&3&lAwesomeLevels'
 
 #Max Level
-numberOfLevels: 100
-
-#Other prices change according to the first price
-firstLevelPrice: 1000.0
+numberOfLevels: 10
 
 #Effects when leveling up!
 levelUpSound: true

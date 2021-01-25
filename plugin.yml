@@ -1,6 +1,6 @@
 name: AwesomeLevels
 main: com.emiv.awesomelevels.Main
-version: 1.5
+version: 1.6
 api-version: 1.16
 softdepend: [Vault]
 commands:

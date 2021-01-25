@@ -17,11 +17,9 @@ import net.milkbowl.vault.economy.Economy;
 public class Main extends JavaPlugin{
 	
 	
-	SetupRankupPrices rankupPriceClass;
 	public static Main mainClass;
 	
 	public void instanceClasses() {
-		rankupPriceClass = new SetupRankupPrices();
 		mainClass = this;
 	}
  	
@@ -41,6 +39,14 @@ public class Main extends JavaPlugin{
 	private File pFile;
 	private YamlConfiguration pYaml;
 	
+	//LevelRequirements
+	private File reqFile;
+	private YamlConfiguration reqYaml;
+	
+	//PlayerStats
+	private File sFile;
+	private YamlConfiguration sYaml;
+	
 	@Override
 	public void onEnable() {
 		setupEconomy();
@@ -49,13 +55,6 @@ public class Main extends JavaPlugin{
 		
 		this.saveDefaultConfig();
 		
-		Bukkit.getPluginManager().registerEvents(new onJoin(this), this);
-		Bukkit.getPluginManager().registerEvents(new onChat(this), this);
-		Bukkit.getPluginManager().registerEvents(new LevelListener(this), this);
-		
-		getCommand("level").setExecutor(new LevelCommand(this));
-		getCommand("alreload").setExecutor(new ReloadCommand(this));
-		
 		try {
 			initiateFiles();
 		} catch (IOException e) {
@@ -63,9 +62,20 @@ public class Main extends JavaPlugin{
 		}
 		
 		setMsg();
-		rankupPriceClass.SetupPrices();
+		setReq();
 		setRewards();
 		Save();
+		
+		Bukkit.getPluginManager().registerEvents(new onJoin(this), this);
+		Bukkit.getPluginManager().registerEvents(new onChat(this), this);
+		Bukkit.getPluginManager().registerEvents(new LevelListener(this), this);
+		Bukkit.getPluginManager().registerEvents(new onKill(this), this);
+		Bukkit.getPluginManager().registerEvents(new onMine(this), this);
+		
+		getCommand("level").setExecutor(new LevelCommand(this));
+		getCommand("alreload").setExecutor(new ReloadCommand(this));
+		
+
 		
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(Bukkit.getPluginManager().getPlugin("AwesomeLevels"), new Runnable() {
 		    @Override
@@ -75,6 +85,47 @@ public class Main extends JavaPlugin{
 		}, 0L, 200L);
 	}
 	
+	private void setReq() {
+		if (!reqYaml.contains("Level1") && this.getConfig().getInt("numberOfLevels") >= 1) {
+			reqYaml.set("Level1.Coin", 1000);
+			reqYaml.set("Level1.Kill.Type", "CHICKEN");
+			reqYaml.set("Level1.Kill.Amount", 25);
+		}
+		if (!reqYaml.contains("Level2") && this.getConfig().getInt("numberOfLevels") >= 2) {
+			reqYaml.set("Level2.Coin", 20000);
+		}
+		if (!reqYaml.contains("Level3") && this.getConfig().getInt("numberOfLevels") >= 3) {
+			reqYaml.set("Level3.Coin", 50000);
+			reqYaml.set("Level3.Mine.Type", "STONE");
+			reqYaml.set("Level3.Mine.Amount", 640);
+		}
+		if (!reqYaml.contains("Level4") && this.getConfig().getInt("numberOfLevels") >= 4) {
+			reqYaml.set("Level4.Coin", 100000);
+		}
+		if (!reqYaml.contains("Level5") && this.getConfig().getInt("numberOfLevels") >= 5) {
+			reqYaml.set("Level5.Coin", 150000);
+		}
+		if (!reqYaml.contains("Level6") && this.getConfig().getInt("numberOfLevels") >= 6) {
+			reqYaml.set("Level6.Coin", 250000);
+		}
+		if (!reqYaml.contains("Level7") && this.getConfig().getInt("numberOfLevels") >= 7) {
+			reqYaml.set("Level7.Coin", 500000);
+		}
+		if (!reqYaml.contains("Level8") && this.getConfig().getInt("numberOfLevels") >= 8) {
+			reqYaml.set("Level8.Coin", 1000000);
+		}
+		if (!reqYaml.contains("Level9") && this.getConfig().getInt("numberOfLevels") >= 9) {
+			reqYaml.set("Level9.Coin", 2000000);
+		}
+		if (!reqYaml.contains("Level10") && this.getConfig().getInt("numberOfLevels") >= 10) {
+			reqYaml.set("Level10.Coin", 5000000);
+			reqYaml.set("Level10.Kill.Type", "ZOMBIE");
+			reqYaml.set("Level10.Kill.Amount", 200);
+			reqYaml.set("Level10.Mine.Type", "DIAMOND_ORE");
+			reqYaml.set("Level10.Mine.Amount", 64);
+		}
+	}
+
 	void SetPotionEffects() {
 		String[] effects = {"FAST_DIGGING", "FIRE_RESISTANCE", "INCREASE_DAMAGE", "JUMP", "NIGHT_VISION", "REGENERATION", "SPEED", "WATER_BREATHING"};
 		for (Player p : Bukkit.getOnlinePlayers()) {
@@ -91,8 +142,8 @@ public class Main extends JavaPlugin{
 			mYaml.set("NoPermission", "&cYou don't have permission.");
 		} if (!mYaml.contains("Reloaded")) {
 			mYaml.set("Reloaded", "&aSuccessfully Reloaded.");
-		} if (!mYaml.contains("LevelUpNoMoney")) {
-			mYaml.set("LevelUpNoMoney", "&cInsufficient balance.");
+		} if (!mYaml.contains("LevelUpNotMet")) {
+			mYaml.set("LevelUpNotMet", "&cRequirements are not met.");
 		} if (!mYaml.contains("LevelUpMaxLevel")) {
 			mYaml.set("LevelUpMaxLevel", "&eYou are max level.");
 		}  if (!mYaml.contains("LevelUpSuccess")) {
@@ -104,16 +155,16 @@ public class Main extends JavaPlugin{
 		rYaml.set("Level1.Reward.Message", "&eYou recieved 5 diamonds for leveling up!");
 		rYaml.set("Level1.Reward.Text", "5 Diamonds");
 		rYaml.set("Level1.Commands.Console", "give %player% diamond 5");
-		rYaml.set("Level10.Reward.Message", "&eYou unlocked kit king and permanent Haste I for leveling up!");
-		rYaml.set("Level10.Reward.Text", "King Kit\nHaste I");
-		rYaml.set("Level10.Effect.Type", "FAST_DIGGING");
-		rYaml.set("Level10.Effect.Tier", 1);
-		rYaml.set("Level100.Reward.Message", "&eYou recieved VIP Rank and permanent Strength II for being max level!");
-		rYaml.set("Level100.Reward.Text", "VIP Rank\nStrength II");
-		rYaml.set("Level100.Commands.Console", "lp user %player% parent set vip");
-		rYaml.set("Level100.Commands.Player", "say I am now max level!");
-		rYaml.set("Level100.Effect.Type", "INCREASE_DAMAGE");
-		rYaml.set("Level100.Effect.Tier", 2);
+		rYaml.set("Level5.Reward.Message", "&eYou unlocked kit king and permanent Haste I for leveling up!");
+		rYaml.set("Level5.Reward.Text", "King Kit\nHaste I");
+		rYaml.set("Level5.Effect.Type", "FAST_DIGGING");
+		rYaml.set("Level5.Effect.Tier", 1);
+		rYaml.set("Level10.Reward.Message", "&eYou recieved VIP Rank and permanent Strength II for being max level!");
+		rYaml.set("Level10.Reward.Text", "VIP Rank\nStrength II");
+		rYaml.set("Level10.Commands.Console", "lp user %player% parent set vip");
+		rYaml.set("Level10.Commands.Player", "say I am now max level!");
+		rYaml.set("Level10.Effect.Type", "INCREASE_DAMAGE");
+		rYaml.set("Level10.Effect.Tier", 2);
 	}
 	
 	
@@ -121,6 +172,7 @@ public class Main extends JavaPlugin{
 		try {
 			mYaml.save(mFile);
 			rYaml.save(rFile);
+			reqYaml.save(reqFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -150,6 +202,10 @@ public class Main extends JavaPlugin{
 	public File getRFile() { return rFile; }
 	public YamlConfiguration getPYaml() { return pYaml; }
 	public File getPFile() { return pFile; }
+	public YamlConfiguration getReqYaml() { return reqYaml; }
+	public File getReqFile() { return reqFile; }
+	public YamlConfiguration getSYaml() { return sYaml; }
+	public File getSFile() { return sFile; }
 	
 	public void initiateFiles() throws IOException {
 		lFile = new File(Bukkit.getServer().getPluginManager().getPlugin("AwesomeLevels").getDataFolder(), "levels.yml");
@@ -179,6 +235,20 @@ public class Main extends JavaPlugin{
 		}
 		
 		pYaml = YamlConfiguration.loadConfiguration(pFile);
+		
+		reqFile = new File(Bukkit.getServer().getPluginManager().getPlugin("AwesomeLevels").getDataFolder(), "requirements.yml");
+		if (!reqFile.exists()) {
+			reqFile.createNewFile();
+		}
+		
+		reqYaml = YamlConfiguration.loadConfiguration(reqFile);
+		
+		sFile = new File(Bukkit.getServer().getPluginManager().getPlugin("AwesomeLevels").getDataFolder(), "stats.yml");
+		if (!sFile.exists()) {
+			sFile.createNewFile();
+		}
+		
+		sYaml = YamlConfiguration.loadConfiguration(sFile);
 	}
 
 }

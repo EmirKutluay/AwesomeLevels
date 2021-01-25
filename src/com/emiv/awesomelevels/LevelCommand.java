@@ -62,8 +62,36 @@ public class LevelCommand implements CommandExecutor {
 		playerHeadMeta.setLore(headLore);
 		playerHead.setItemMeta(playerHeadMeta);
 		gui.setItem(12, playerHead);
+		String nextLevel = String.valueOf(playerLevel + 1);
+		boolean everyThingChecks = true;
+		if (Main.econ.getBalance(p) >= plugin.getReqYaml().getInt("Level" + nextLevel + ".Coin")) {
+			if (plugin.getReqYaml().contains("Level" + nextLevel + ".Mine.Type") && plugin.getReqYaml().contains("Level" + nextLevel + ".Mine.Amount")) {
+				if (plugin.getSYaml().contains(p.getName() + ".Mine." + plugin.getReqYaml().getString("Level" + nextLevel + ".Mine.Type"))) {
+					if (plugin.getSYaml().getInt(p.getName() + ".Mine." + plugin.getReqYaml().getString("Level" + nextLevel + ".Mine.Type")) == plugin.getReqYaml().getInt("Level" + nextLevel + ".Mine.Amount")) {
+					} else {
+						everyThingChecks = false;
+					}
+				} else {
+					everyThingChecks = false;
+				}
+			}
+			if (plugin.getReqYaml().contains("Level" + nextLevel + ".Kill.Type") && plugin.getReqYaml().contains("Level" + nextLevel + ".Kill.Amount")) {
+				if (plugin.getSYaml().contains(p.getName() + ".Kill." + plugin.getReqYaml().getString("Level" + nextLevel + ".Kill.Type"))) {
+					if (plugin.getSYaml().getInt(p.getName() + ".Kill." + plugin.getReqYaml().getString("Level" + nextLevel + ".Kill.Type")) == plugin.getReqYaml().getInt("Level" + nextLevel + ".Kill.Amount")) {
+						//
+					} else {
+						everyThingChecks = false;
+					}
+				} else {
+					everyThingChecks = false;
+				}
+			}
+		} else {
+			everyThingChecks = false;
+		}
 		//LevelUpButton
-		if (Main.econ.getBalance(p) >= SetupRankupPrices.rankupPrices.get(playerLevel + 1) && playerLevel != plugin.getConfig().getInt("numberOfLevels")) {
+		if (everyThingChecks && playerLevel != plugin.getConfig().getInt("numberOfLevels")) {
+
 			ItemStack greenPane = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
 			ItemMeta greenPaneMeta = greenPane.getItemMeta();
 			greenPaneMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&a&lLevel %level% -> %nextlevel%".replace("%level%", String.valueOf(playerLevel)).replace("%nextlevel%", String.valueOf(playerLevel + 1))));
@@ -74,7 +102,28 @@ public class LevelCommand implements CommandExecutor {
 				greenPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&a&l- &7" + plugin.getRYaml().getString("Level" + String.valueOf(playerLevel + 1) + ".Reward.Text")));
 			}
 			greenPaneLore.add("");
-			greenPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&7Cost: $&a" + String.valueOf(SetupRankupPrices.rankupPrices.get(playerLevel + 1))));
+			greenPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&eRequirements:"));
+			greenPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&8- &7$&a" + String.valueOf(plugin.getReqYaml().getInt("Level" + nextLevel + ".Coin"))));
+			if (plugin.getReqYaml().contains("Level" + nextLevel + ".Kill.Type") && plugin.getReqYaml().contains("Level" + nextLevel + ".Kill.Amount")) {
+				String totalKills = String.valueOf(plugin.getReqYaml().get("Level" + nextLevel + ".Kill.Amount"));
+				String killType = plugin.getReqYaml().getString("Level" + nextLevel + ".Kill.Type");
+				if (plugin.getSYaml().contains(p.getName() + ".Kill." + plugin.getReqYaml().getString("Level" + nextLevel + ".Kill.Type"))) {
+					String pKills = String.valueOf(plugin.getSYaml().get(p.getName() + ".Kill." + killType));
+					greenPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&8- &7" + pKills + "&8/&7" + totalKills + " &d&l" + killType + " &7Kills"));
+				} else {
+					greenPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&8- &70" + "&8/&7" + totalKills + " &d&l" + killType + " &7Kills"));
+				}
+			}
+			if (plugin.getReqYaml().contains("Level" + nextLevel + ".Mine.Type") && plugin.getReqYaml().contains("Level" + nextLevel + ".Mine.Amount")) {
+				String totalBlocks = String.valueOf(plugin.getReqYaml().get("Level" + nextLevel + ".Mine.Amount"));
+				String mineType = plugin.getReqYaml().getString("Level" + nextLevel + ".Mine.Type");
+				if (plugin.getSYaml().contains(p.getName() + ".Mine." + plugin.getReqYaml().getString("Level" + nextLevel + ".Mine.Type"))) {
+					String pBroken = String.valueOf(plugin.getSYaml().get(p.getName() + ".Mine." + mineType));
+					greenPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&8- &7" + pBroken + "&8/&7" + totalBlocks + " &d&l" + mineType + " &7Broken"));
+				} else {
+					greenPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&8- &70" + "&8/&7" + totalBlocks + " &d&l" + mineType + " &7Broken"));
+				}
+			}
 			greenPaneMeta.setLore(greenPaneLore);
 			greenPane.setItemMeta(greenPaneMeta);
 			gui.setItem(14, greenPane);
@@ -89,7 +138,28 @@ public class LevelCommand implements CommandExecutor {
 				redPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&c&l- &7" + plugin.getRYaml().getString("Level" + String.valueOf(playerLevel + 1) + ".Reward.Text")));
 			}
 			redPaneLore.add("");
-			redPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&7Cost: $&c" + String.valueOf(SetupRankupPrices.rankupPrices.get(playerLevel + 1))));
+			redPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&eRequirements:"));
+			redPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&8- &7$&a" + String.valueOf(plugin.getReqYaml().getInt("Level" + nextLevel + ".Coin"))));
+			if (plugin.getReqYaml().contains("Level" + nextLevel + ".Kill.Type") && plugin.getReqYaml().contains("Level" + nextLevel + ".Kill.Amount")) {
+				String totalKills = String.valueOf(plugin.getReqYaml().get("Level" + nextLevel + ".Kill.Amount"));
+				String killType = plugin.getReqYaml().getString("Level" + nextLevel + ".Kill.Type");
+				if (plugin.getSYaml().contains(p.getName() + ".Kill." + plugin.getReqYaml().getString("Level" + nextLevel + ".Kill.Type"))) {
+					String pKills = String.valueOf(plugin.getSYaml().get(p.getName() + ".Kill." + killType));
+					redPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&8- &7" + pKills + "&8/&7" + totalKills + " &d&l" + killType + " &7Kills"));
+				} else {
+					redPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&8- &70" + "&8/&7" + totalKills + " &d&l" + killType + " &7Kills"));
+				}
+			}
+			if (plugin.getReqYaml().contains("Level" + nextLevel + ".Mine.Type") && plugin.getReqYaml().contains("Level" + nextLevel + ".Mine.Amount")) {
+				String totalBlocks = String.valueOf(plugin.getReqYaml().get("Level" + nextLevel + ".Mine.Amount"));
+				String mineType = plugin.getReqYaml().getString("Level" + nextLevel + ".Mine.Type");
+				if (plugin.getSYaml().contains(p.getName() + ".Mine." + plugin.getReqYaml().getString("Level" + nextLevel + ".Mine.Type"))) {
+					String pBroken = String.valueOf(plugin.getSYaml().get(p.getName() + ".Mine." + mineType));
+					redPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&8- &7" + pBroken + "&8/&7" + totalBlocks + " &d&l" + mineType + " &7Broken"));
+				} else {
+					redPaneLore.add(ChatColor.translateAlternateColorCodes('&', "&8- &70" + "&8/&7" + totalBlocks + " &d&l" + mineType + " &7Broken"));
+				}
+			}
 			redPaneMeta.setLore(redPaneLore);
 			redPane.setItemMeta(redPaneMeta);
 			gui.setItem(14, redPane);

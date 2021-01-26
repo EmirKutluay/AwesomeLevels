@@ -208,7 +208,10 @@ public class Main extends JavaPlugin{
 	public File getSFile() { return sFile; }
 	
 	public void initiateFiles() throws IOException {
-		lFile = new File(Bukkit.getServer().getPluginManager().getPlugin("AwesomeLevels").getDataFolder(), "levels.yml");
+		File subdir = new File(Bukkit.getServer().getPluginManager().getPlugin("AwesomeLevels").getDataFolder().getPath() + System.getProperty("file.separator") + "PlayerData");
+		subdir.mkdir();
+		
+		lFile = new File(subdir.getPath(), "levels.yml");
 		if (!lFile.exists()) {
 			lFile.createNewFile();
 		}
@@ -229,7 +232,7 @@ public class Main extends JavaPlugin{
 		
 		rYaml = YamlConfiguration.loadConfiguration(rFile);
 		
-		pFile = new File(Bukkit.getServer().getPluginManager().getPlugin("AwesomeLevels").getDataFolder(), "potioneffects.yml");
+		pFile = new File(subdir.getPath(), "potioneffects.yml");
 		if (!pFile.exists()) {
 			pFile.createNewFile();
 		}
@@ -243,7 +246,7 @@ public class Main extends JavaPlugin{
 		
 		reqYaml = YamlConfiguration.loadConfiguration(reqFile);
 		
-		sFile = new File(Bukkit.getServer().getPluginManager().getPlugin("AwesomeLevels").getDataFolder(), "stats.yml");
+		sFile = new File(subdir.getPath(), "stats.yml");
 		if (!sFile.exists()) {
 			sFile.createNewFile();
 		}
